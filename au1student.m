@@ -409,17 +409,21 @@ global docked   % ==0: Satelites NOT docked,  ==1: Satelites docked
   VNEW(1,2) = V(1,2) + F(1,2)/M(2,2) * dt;
   XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2)/2) * dt;
   
-  if ((X(1,2)-X(1,1))  <= 5)
-      if (V(1,1) < 2 && V(1,1) > 0)
-          
+  if ((X(1,2)-X(1,1)) <= 5 && docked == 0) %distance under 5 and not docked
+      if (V(1,1) < 2 && V(1,1) > 0) %relative speed ok for docking
+          VNEW(1,1) = M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
+          VNEW(1,2) = VNEW(1,1);
           docked = 1;
+      elseif (V(1,1) < 0)
+          VNEW(1,1) = V(1,1) + F(1,1)/M(1,1) * dt;
+          XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1)/2) * dt;
+          VNEW(1,2) = V(1,2) + F(1,2)/M(2,2) * dt;
+          XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2)/2) * dt;
       else
-          VNEW(1,1) = (M(1,1) - M(2,2)) / (M(1,1) + M(2,2)) * V(1,1);
-          VNEW(1,2) = 2*M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
-      end
-      
-      
-      
+          %krock
+          VNEW(1,1) = (M(1,1) - M(2,2)) / (M(1,1) + M(2,2)) * V(1,1); 
+          VNEW(1,2) = (2*M(1,1)) / (M(1,1) + M(2,2)) * V(1,1);
+      end  
   end
   
   
