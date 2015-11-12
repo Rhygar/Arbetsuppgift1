@@ -400,5 +400,11 @@ global docked   % ==0: Satelites NOT docked,  ==1: Satelites docked
 % 
 % Delete the two dummy lines below and put new code here
 
-  XNEW = X;
-  VNEW = V;
+  XNEW = zeros(3,2);
+  VNEW = zeros(3,2);
+  
+  VNEW(1,1) = V(1,1) + F(1,1)/M(1,1) * dt;
+  XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1)/2) * dt;
+  
+  
+  
