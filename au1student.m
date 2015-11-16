@@ -400,35 +400,49 @@ global docked   % ==0: Satelites NOT docked,  ==1: Satelites docked
 % 
 % Delete the two dummy lines below and put new code here
 
+  %creating new matrix instead of using XNEW = X due to debugging purpose.
   XNEW = zeros(3,2);
   VNEW = zeros(3,2);
   
-  %updating X and V
-  VNEW(1,1) = V(1,1) + F(1,1)/M(1,1) * dt;
-  XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1)/2) * dt;  
-  VNEW(1,2) = V(1,2) + F(1,2)/M(2,2) * dt;
-  XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2)/2) * dt;
+  %when docked the thrust will affect both satellites
+  if (docked == 1) 
+      totalMass = M(1,1) + M(2,2);
+      VNEW(1,1) = V(1,1) + F(1,1)/totalMass * dt;
+      XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1))/2 * dt;
+      XNEW(1,2) = XNEW(1,1) + 5;
   
-  if ((X(1,2)-X(1,1)) <= 5 && docked == 0) %distance under 5 and not docked
-      if (V(1,1) < 0)
-          %do nothing, after collision 
-          
-      elseif ((V(1,1) - V(1,2)) < 2) %relative speed ok for docking
-          
+  %relative distance under 5m 
+  elseif ((X(1,2)-X(1,1)) <= 5)       
+      
+      %relative speed ok for docking
+      if (abs((V(1,1) - V(1,2))) < 2) 
+            %total elastic collision, both satellites will have same
+            %velocity. A difference in X-axis with an offset of 5 meters 
             VNEW(1,1) = M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
             VNEW(1,2) = VNEW(1,1);
-            docked = 1;
-          
+            XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1))/2 * dt;
+            XNEW(1,2) = XNEW(1,1) + 5;
+            docked = 1;          
      
       else
-          %krock
-          %VNEW(1,1) = (M(1,1) - M(2,2)) / (M(1,1) + M(2,2)) * V(1,1);
-          %VNEW(1,2) = 2*M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
+          %elastic collision. 
+          %formulas from conservation of kinetic energy and momentum after
+          %an elastic collision between two subjects with speed and mass in
+          %one dimension.
           VNEW(1,1) = ((V(1,1)*(M(1,1) - M(2,2))) + (2*M(2,2)*V(1,2))) / (M(1,1) + M(2,2));
           VNEW(1,2) = ((V(1,2)*(M(2,2) - M(1,1))) + (2*M(1,1)*V(1,1))) / (M(1,1) + M(2,2));
-          XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1)/2) * dt;  
-          XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2)/2) * dt;
+          %sat1 should bounce back hence the minus sign in formula. 
+          XNEW(1,1) = X(1,1) - (V(1,1) + VNEW(1,1))/2 * dt;  
+          XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2))/2 * dt;
       end
+  
+  else
+      %updating X and V when not docked nor within acceptable docking
+      %distance.
+      VNEW(1,1) = V(1,1) + F(1,1)/M(1,1) * dt;
+      XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1))/2 * dt;  
+      VNEW(1,2) = V(1,2) + F(1,2)/M(2,2) * dt;
+      XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2))/2 * dt;
       
   end
 
