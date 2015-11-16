@@ -252,7 +252,7 @@ switch action
 
         % ~~~~~~~~~~~ Initial values  for Satelite docking ~~~~~
         X = zeros(3,2);
-        X(1,1) = -100.0;
+        X(1,1) = -12.0;
         X(1,2) = 0.0;
         V = zeros(3,2);
         F = zeros(3,2);
@@ -413,9 +413,8 @@ global docked   % ==0: Satelites NOT docked,  ==1: Satelites docked
       if (V(1,1) < 0)
           %do nothing, after collision 
           
-      elseif (V(1,1) - V(1,2) < 2) %relative speed ok for docking
+      elseif ((V(1,1) - V(1,2)) < 2) %relative speed ok for docking
           
-            ((X(1,2)-X(1,1)) <= 0)
             VNEW(1,1) = M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
             VNEW(1,2) = VNEW(1,1);
             docked = 1;
@@ -423,8 +422,12 @@ global docked   % ==0: Satelites NOT docked,  ==1: Satelites docked
      
       else
           %krock
-          VNEW(1,1) = (M(1,1) - M(2,2)) / (M(1,1) + M(2,2)) * V(1,1);
-          VNEW(1,2) = 2*M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
+          %VNEW(1,1) = (M(1,1) - M(2,2)) / (M(1,1) + M(2,2)) * V(1,1);
+          %VNEW(1,2) = 2*M(1,1) / (M(1,1) + M(2,2)) * V(1,1);
+          VNEW(1,1) = ((V(1,1)*(M(1,1) - M(2,2))) + (2*M(2,2)*V(1,2))) / (M(1,1) + M(2,2));
+          VNEW(1,2) = ((V(1,2)*(M(2,2) - M(1,1))) + (2*M(1,1)*V(1,1))) / (M(1,1) + M(2,2));
+          XNEW(1,1) = X(1,1) + (V(1,1) + VNEW(1,1)/2) * dt;  
+          XNEW(1,2) = X(1,2) + (V(1,2) + VNEW(1,2)/2) * dt;
       end
       
   end
