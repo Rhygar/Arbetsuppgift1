@@ -252,7 +252,7 @@ switch action
 
         % ~~~~~~~~~~~ Initial values  for Satelite docking ~~~~~
         X = zeros(3,2);
-        X(1,1) = -12.0;
+        X(1,1) = -100.0;
         X(1,2) = 0.0;
         V = zeros(3,2);
         F = zeros(3,2);
